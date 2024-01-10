@@ -6,6 +6,7 @@ class Kulud:
         self.kogus = kogus
         self.hind = hind
         self.kuupaev = kuupaev
+        self.kogu_maksumus = hind * kogus
         
     def __repr__(self): # Esitab mäluaadressi stringina
         return f"<Kulud: {self.nimi}, {self.liik}, {self.kogus}, {self.hind:.3f}€ >"

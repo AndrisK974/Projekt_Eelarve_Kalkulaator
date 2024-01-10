@@ -13,9 +13,13 @@ def kulude_vaatlemine(kulutused):
     for expense in kulutused:
         kulud_liigiti.setdefault(expense.liik, []).append(expense)
 
-    for kategooria, category_expenses in kulud_liigiti.items():
-        category_expenses.sort(key=lambda x: x.hind)
-        odavam_toode, kallim_toode = category_expenses[:2]
+    for kategooria, kategooria_kulutused in kulud_liigiti.items():
+        kategooria_kulutused.sort(key=lambda x: x.hind)
+        if len(kategooria_kulutused) == 1:
+            odavam_toode = kallim_toode = kategooria_kulutused[0]
+        else:
+            odavam_toode, kallim_toode = kategooria_kulutused[:2]
+
         if odavam_toode.hind > 0 and kallim_toode.hind > 0:
             hinna_erinevus_protsent = ((kallim_toode.hind - odavam_toode.hind) / odavam_toode.hind) * 100
             if hinna_erinevus_protsent > 0:
@@ -150,15 +154,16 @@ def kasutaja_liida_kulu(tee_csv_failini, eelarve):
     for expense in kulutused1:
         key = expense.liik
         if key in kulud_liigiti:
-            kulud_liigiti[key] += expense.kogus
+            kulud_liigiti[key].append(expense)
         else:
-            kulud_liigiti[key] = expense.kogus
+            kulud_liigiti[key] = [expense]
 
     print("Kulud liigiti: ")
-    for key, amount in kulud_liigiti.items():
-        print(f"  {key}: {amount:.2f}€")
+    for key, kogus in kulud_liigiti.items():
+        kulud_kokku = sum([kul.kogu_maksumus for kul in kulutused1])
+        print(f"  {key}: {kulud_kokku:.2f}€")
 
-    kulude_summa = sum([kul.kogus for kul in kulutused1])
+    kulude_summa = sum([kul.kogu_maksumus for kul in kulutused1])
     print(f"Oled sellel kuul kokku kulutanud {kulude_summa:.2f}€")
 
     raha_alles = eelarve - kulude_summa
